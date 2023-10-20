@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:reproductoriptv/pages/channelList.dart';
 
 import '../model/canal.dart';
 import '../pages/video_player.dart';
 
+///Disposición del elemento canal en la lista
 class ChannelLayout extends StatelessWidget {
   final FocusNode focusNode = FocusNode();
   final Canal canal;
 
-  ChannelLayout({required this.canal});
+  ChannelLayout({super.key, required this.canal});
 
   @override
   Widget build(BuildContext context) {
@@ -53,12 +55,51 @@ class ChannelLayout extends StatelessWidget {
     );
   }
 }
-
+///Disposición del elemento grupo en la lista
 class GroupLayout extends StatelessWidget{
+  final String title;
+  final List<Canal>? channels;
+  final FocusNode focusNode = FocusNode();
+
+  GroupLayout({super.key, required this.title, required this.channels});
+
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
-    throw UnimplementedError();
+    //Esto es para cuando esté localizado y se pulse ok
+    return Focus(
+        focusNode: focusNode,
+        onKey: (FocusNode node, RawKeyEvent event) {
+          if (event is RawKeyDownEvent) {
+            if (event.logicalKey == LogicalKeyboardKey.enter || event.logicalKey == LogicalKeyboardKey.select) {
+              if(channels != null) {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => ChannelList(channels: channels!),),);
+              }else{
+                print("no hay canales");
+              }
+              return KeyEventResult.handled; // Consumir el evento
+            }
+          }
+          return KeyEventResult.ignored; // No consumir el evento
+        },
+        child:
+        //Esto es para cuando hay un toque, es decir, se pulsa el táctil o con ratón
+        InkWell(
+            onTap: (){
+              if(channels != null) {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => ChannelList(channels: channels!),),);
+              }else{
+                print("no hay canales");
+              }
+            },
+            child: Container(
+                margin: const EdgeInsets.only(top: 10.0, bottom: 10.0),
+                child: Row(children: [
+                  const Icon(Icons.playlist_play_sharp),
+                  Text(title)
+                ],)
+            )
+        )
+    );
   }
   
 }
